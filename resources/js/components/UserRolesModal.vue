@@ -1,39 +1,78 @@
 <script setup>
 import Modal from './Modal.vue';
 import { ref, computed } from 'vue';
+import PrimaryButton from './PrimaryButton.vue';
+import SecondaryButton from './SecondaryButton.vue';
 
 const props = defineProps({
-    
+    show: {
+    type: Boolean,
+    default: false
+    },
+    maxWidth: {
+        type: String,
+        default: '2xl'
+    },
+    closeable: {
+        type: Boolean,
+        default: true
+    },
+    userId: {
+        type: [String, Number],
+        default: null
+    }
 });
+
+const emit = defineEmits(['close']);
+
+const close = () => {
+  emit('close');
+};
+
+const saveRoles = () => {
+  console.log('Guardando roles para usuario:', props.userId);
+  close();
+};
+
+
 
 </script>
 
 <template>
-    <div class="pop-up bg-white-500 dark:bg-white-500 text-white px-4 py-2 relative flex justify-center items-center">
+    <Modal
+        :show="show"
+        :max-width="maxWidth"
+        :closeable="closeable"
+        @close="close"
+    >
         <div class="pop-up-inner">
-            <div class="pop-up-close">
-                x
-            </div>
-             <h2 class="text-lg font-medium text-gray-900 mb-4">
-                Gestionar Roles para Usuario ID: {{ userId }}
-            </h2>
-            
-            <div class="flex justify-center space-x-4 mt-6 bg-white-500 dark:bg-white-500">
-                <button
-                    @click="$emit('close')"
-                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none"
-                >
-                    Cancelar
-                </button>
-                <button
-                    @click="saveRoles"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-                >
-                    Guardar Cambios
-                </button>
-            </div>
+        <div class="pop-up-close" @click="close">x</div>
+
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Gestionar Roles para Usuario ID: {{ userId }}
+        </h2>
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Gestionar Roles para Usuario ID: {{ userId }}
+        </h2>
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Gestionar Roles para Usuario ID: {{ userId }}
+        </h2>
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Gestionar Roles para Usuario ID: {{ userId }}
+        </h2>
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Gestionar Roles para Usuario ID: {{ userId }}
+        </h2>
+        <div class="flex justify-center space-x-4 mt-6">
+            <SecondaryButton @click="close">
+            Cancelar
+            </SecondaryButton>
+            <PrimaryButton @click="saveRoles">
+            Guardar Cambios
+            </PrimaryButton>
         </div>
-    </div>
+        </div>
+    </Modal>
 </template>
 <style lang="scss">
     .pop-up {
@@ -63,7 +102,7 @@ const props = defineProps({
         }
 
         &-inner {
-            background-color: rgba(255, 255, 255, 0.836);
+            background-color: rgb(255, 255, 255);
             color: #000;
             position: relative;
             width: 100%;

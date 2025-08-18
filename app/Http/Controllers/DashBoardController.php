@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Permission;
+
 
 class DashBoardController extends Controller
 {

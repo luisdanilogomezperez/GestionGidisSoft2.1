@@ -6,6 +6,7 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use App\Models\MenuItem;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -39,6 +40,17 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        // Cargar los ítems de menú y filtrarlos por permisos
+        $menuItems = MenuItem::orderBy('order')->get()->filter(function ($item) use ($request) {
+            // Mostrar siempre si no tiene permiso asignado
+            if (!$item->permission) {
+                return true;
+            }
+
+            // Mostrar si el usuario tiene el permiso
+            return $request->user()?->can($item->permission);
+        })->values();
+
         return [
             ...parent::share($request),
             'user.roles' => $request->user() ? $request->user()->getRoleNames() : [],
@@ -53,6 +65,8 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            
+            'menu' => $menuItems,
         ];
     }
 }

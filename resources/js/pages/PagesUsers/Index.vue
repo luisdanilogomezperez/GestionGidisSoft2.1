@@ -5,12 +5,11 @@ import { Head } from '@inertiajs/vue3';
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import CollapsibleCard from '@/components/CollapsibleCard.vue';
-import DialogModal from '@/components/DialogModal.vue'
 import UserRolesModal from '@/components/UserRolesModal.vue'
 
 const isRoleModalOpen = ref(false)
 const selectedUserId = ref<number | string | null>(null)
-const maxWidth = '2xl'
+const maxWidth = 'xl'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -105,10 +104,8 @@ function handleUserAction(userId) {
         break;
       
     case 'gestion_roles':
-        alert('gestion_roles')
         selectedUserId.value = userId;
         isRoleModalOpen.value = true;
-        alert(isRoleModalOpen.value)
       break;
 
     default:
@@ -236,33 +233,17 @@ function handleUserAction(userId) {
                     
                 </div>
             </CollapsibleCard>
-            
-            
         </div>
-        {{ isRoleModalOpen }}
+        <div>
             <!-- Modal de gestión de roles -->
-        <UserRolesModal
+            <UserRolesModal
             :show="isRoleModalOpen"
-            max-width="2xl"
+            :max-width="maxWidth"
+            :user-id="selectedUserId"
             @close="isRoleModalOpen = false"
-        >
-            <template #title>
-                Gestionar roles del usuario {{ selectedUserId }}
-            </template>
-
-            <template #content>
-                Aquí iría la gestión de roles para el usuario **{{ selectedUserId }}**.
-            </template>
-
-            <template #footer>
-                <button
-                    class="bg-gray-500 text-white px-4 py-2 rounded"
-                    @click="isRoleModalOpen = false"
-                >
-                    Cerrar
-                </button>
-            </template>
-        </UserRolesModal>
-
+            />
+        </div>
     </AppLayout>
+        
+        
 </template>

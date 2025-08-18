@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!--<script setup lang="ts">
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -12,7 +12,8 @@ import AppLogo from './AppLogo.vue';
 
 const page = usePage();
 const userPermissions = page.props.user.permissions;
-
+const permissionsUsers = page.props.permissions;
+console.log('permissions users:', permissionsUsers);
 const mainNavItems: (NavItem & { permission?: string })[] = [
     {
         title: 'Dashboard',
@@ -118,4 +119,95 @@ const footerNavItems: NavItem[] = [
         </SidebarFooter>
     </Sidebar>
     <slot />
+</template>
+-->
+
+<script setup lang="ts">
+import NavMain from '@/components/NavMain.vue'
+import NavFooter from '@/components/NavFooter.vue'
+import NavUser from '@/components/NavUser.vue'
+import {
+  Sidebar, SidebarContent, SidebarFooter, SidebarHeader,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem
+} from '@/components/ui/sidebar'
+import { Link, usePage } from '@inertiajs/vue3'
+import AppLogo from './AppLogo.vue'
+
+// Datos de Inertia (asegúrate que en tu HandleInertiaRequests envías `menu` y `user.permissions`)
+const page = usePage()
+const userPermissions = page.props.user?.permissions ?? []
+
+const backendMenu =  page.props.menu
+// Iconos (busca primero en Kalimah y luego en Lucide)
+import * as Icons from '@kalimahapps/vue-icons'
+import * as LucideIcons from 'lucide-vue-next'
+
+// Tipo extendido local (por si tu NavItem no incluye id/children en '@/types')
+type XNavItem = {
+  id: number
+  title: string
+  href?: string | null
+  icon?: any
+  permission?: string | null
+}
+
+// Mapea nombre → componente de icono
+function getIcon(name?: string | null) {
+  if (!name) return null
+  if ((Icons as any)[name]) return (Icons as any)[name]
+  if ((LucideIcons as any)[name]) return (LucideIcons as any)[name]
+  return null
+}
+
+// Transforma el árbol que llega del backend a XNavItem con componentes de icono
+function transform(items: any[]): XNavItem[] {
+  return (items ?? []).map((it) => ({
+    id: it.id,
+    title: it.title,
+    href: it.href ?? null,
+    icon: getIcon(it.icon),
+    permission: it.permission ?? null
+  }))
+}
+
+const list: XNavItem[] = transform(backendMenu)
+
+function filterByPermissions(items: XNavItem[]): XNavItem[] {
+  return items.filter(it => !it.permission || userPermissions.includes(it.permission))
+}
+
+const visibleList = filterByPermissions(list)
+
+// Footer estático de ejemplo
+const footerNavItems = [
+  { title: 'Github Repo', href: 'https://github.com/laravel/vue-starter-kit', icon: (LucideIcons as any).Folder },
+  { title: 'Documentation', href: 'https://laravel.com/docs/starter-kits#vue', icon: (LucideIcons as any).BookOpen },
+]
+</script>
+
+<template>
+  <Sidebar collapsible="icon" variant="inset">
+    <SidebarHeader>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" as-child>
+            <Link :href="route('dashboard')">
+              <AppLogo />
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarHeader>
+
+    <SidebarContent>
+      <!-- Menú árbol con colapsables -->
+      <NavMain :items="visibleList" />
+    </SidebarContent>
+
+    <SidebarFooter>
+      <NavFooter :items="footerNavItems" />
+      <NavUser />
+    </SidebarFooter>
+  </Sidebar>
+  <slot />
 </template>
