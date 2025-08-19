@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 use App\Models\MenuItem;
+use Illuminate\Support\Facades\Cache;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -51,6 +54,25 @@ class HandleInertiaRequests extends Middleware
             return $request->user()?->can($item->permission);
         })->values();
 
+        $user = $request->user();
+
+        // Cargar roles/permiso del usuario (nombres)
+        $userRoleNames       = $user ? $user->getRoleNames()->toArray() : [];
+        $userPermissionNames = $user ? $user->getPermissionsViaRoles()->pluck('name')->toArray() : [];
+
+        // Sólo Admin/Super Admin verá el catálogo completo (cacheado)
+        $isAdminish = $user && $user->hasAnyRole(['admin','Super Admin']);
+
+        $allRoles = $isAdminish
+            ? Cache::remember('all_roles', 3600, fn() => Role::with('permissions:id,name')->get(['id','name']))
+            : [];
+
+        $allPermissions = $isAdminish
+            ? Cache::remember('all_permissions', 3600, fn () =>
+                Permission::query()->select('id','name')->orderBy('name')->get()->toArray()
+              )
+            : [];
+
         return [
             ...parent::share($request),
             'user.roles' => $request->user() ? $request->user()->getRoleNames() : [],
@@ -59,6 +81,10 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'roles'           => $userRoleNames,
+                'permissions'     => $userPermissionNames,
+                'all_roles'       => $allRoles,
+                'all_permissions' => $allPermissions,
             ],
             'ziggy' => [
                 ...(new Ziggy)->toArray(),

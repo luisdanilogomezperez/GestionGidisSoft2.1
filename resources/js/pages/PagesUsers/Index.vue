@@ -6,10 +6,14 @@ import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import CollapsibleCard from '@/components/CollapsibleCard.vue';
 import UserRolesModal from '@/components/UserRolesModal.vue'
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import PermissionsRolesModal from '@/components/PermissionsRolesModal.vue';
 
 const isRoleModalOpen = ref(false)
+const isPermissionsModalOpen = ref(false)
 const selectedUserId = ref<number | string | null>(null)
 const maxWidth = 'xl'
+const maxWidthPermissions = 'x1'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -112,6 +116,11 @@ function handleUserAction(userId) {
       break;
   }
 }
+
+const permissionsModalOpen = () => {
+   isPermissionsModalOpen.value = true;
+};
+
 </script>
 
 <template>
@@ -120,6 +129,11 @@ function handleUserAction(userId) {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-0 rounded-xl p-2 overflow-x-auto">
             <!-- Área de filtros --> 
+            <div class="block text-sm font-medium text-white-700 dark:text-white-300 mb-3">
+                <PrimaryButton @click="permissionsModalOpen()">
+                    Gestionar Permisos
+                </PrimaryButton>
+            </div>
             <CollapsibleCard title="Filtro" :collapsible="true">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     
@@ -224,7 +238,7 @@ function handleUserAction(userId) {
                             </td>
                             </tr>
                             <tr v-if="filteredUsers.length === 0">
-                            <td colspan="7" class="text-center bg-red-200 dark:bg-red-900 text-red-600 p-4">
+                            <td colspan="7" class="text-center bg-red-100 dark:bg-red-100 text-red-600 p-4">
                                 No se encontraron usuarios.
                             </td>
                             </tr>
@@ -241,6 +255,15 @@ function handleUserAction(userId) {
             :max-width="maxWidth"
             :user-id="selectedUserId"
             @close="isRoleModalOpen = false"
+            />
+        </div>
+        <div>
+            <!-- Modal de gestión de roles -->
+            <PermissionsRolesModal
+            :show="isPermissionsModalOpen"
+            :rol-id="selectedUserId"
+            :max-width="maxWidthPermissions"
+            @close="isPermissionsModalOpen = false"
             />
         </div>
     </AppLayout>
