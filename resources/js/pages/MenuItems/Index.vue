@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import { useForm, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { iconsList } from '../../IconList';
 import * as AllIcons from '@kalimahapps/vue-icons';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import CollapsibleCard from '@/components/CollapsibleCard.vue';
-import { router } from '@inertiajs/vue3'
 import Pagination from '@/components/Pagination.vue';
+import { AkTrashCan, BsPencilSquare } from '@kalimahapps/vue-icons';
 
 const breadcrumbs: BreadcrumbItem[] = [{
   title: 'Configuración Dashboard', 
@@ -27,7 +26,6 @@ const form = useForm({
     order: 0,
 });
 
-const selectedIcon = ref(null);
 const editingId = ref<number | null>(null);
 
 function submit() {
@@ -57,8 +55,8 @@ function submit() {
 // Acciones disponibles
 const itemsActions = ref([
   { value: '', text: 'Seleccione una acción', disabled: true },
-  { value: 'delete', text: 'Eliminar' },
-  { value: 'edit', text: 'Modificar' },
+  { value: 'delete', text: 'Eliminar', icon: AkTrashCan },
+  { value: 'edit', text: 'Modificar', icon: BsPencilSquare },
 ])
 
 
@@ -147,11 +145,11 @@ function handleUserAction(itemId) {
                                   v-model="itemsActionsSelected[item.id]"
                                   @change="handleUserAction(item.id)"
                                   class="w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm p-1"
-                                  >   
+                                  >
                                     <option
-                                        v-for="action in itemsActions"
-                                        :key="action.value"
-                                        :value="action.value"
+                                    v-for="action in itemsActions"
+                                    :key="action.value"
+                                    :value="action.value"
                                     >
                                         {{ action.text }}
                                     </option>

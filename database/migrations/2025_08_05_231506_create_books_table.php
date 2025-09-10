@@ -14,12 +14,17 @@ return new class extends Migration
         Schema::create('books', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('isbn')->nullable();
             $table->string('year')->nullable();
             $table->string('month')->nullable();
-            $table->string('discipline')->nullable();
+            $table->string('total_pages')->nullable();
+            $table->string('start_page')->nullable();
+            $table->string('end_page')->nullable();
+            $table->string('book_series')->nullable();
+            $table->string('edition')->nullable();
+            $table->string('isbn')->nullable();
             $table->string('publisher')->nullable();
             $table->string('publisher_type')->nullable();
+            $table->string('discipline')->nullable();
             $table->string('dissemination_medium')->nullable();
             $table->string('publication_place')->nullable();
             $table->string('evidence_document')->nullable();

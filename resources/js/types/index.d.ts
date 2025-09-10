@@ -25,11 +25,27 @@ export type AppPageProps<T extends Record<string, unknown> = Record<string, unkn
     document_number: string;
     phone_number: string;
     is_enable: boolean;
+    academic_formation?: [];
+    work_experience?: [];
+    roles: string;
     quote: { message: string; author: string };
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
 };
+export interface AcademicFormation {
+  institution: string;
+  degree: string;
+  startYear: integer;
+  endYear?: integer | null;
+}
+
+export interface WorkExperience {
+  company: string;
+  position: string;
+  startYear: integer;
+  endYear?: integer | null;
+}
 
 export interface User {
     id: number;
@@ -40,11 +56,13 @@ export interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
-    document_type?: string;
-    document_number?: string;
-    phone_number?: string;
+    document_type: string;
+    document_number: string;
+    phone_number: string;
     is_enable?: boolean;
     roles?: string;
+    academic_formation?: AcademicFormation[];
+    work_experience?: WorkExperience[];
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

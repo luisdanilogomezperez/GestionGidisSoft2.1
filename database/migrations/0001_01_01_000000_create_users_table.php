@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('document_number')->unique()->nullable();
             $table->string('phone_number')->nullable();
             $table->boolean('is_enable')->default(true);
+            $table->longtext('academic_formation')->nullable();
+            $table->longtext('work_experience')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

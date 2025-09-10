@@ -6,6 +6,11 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
 
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -17,6 +22,8 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .use(Toast)
+            .use(VueSweetalert2)
             .mount(el);
     },
     progress: {

@@ -25,6 +25,26 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'last_name' => ['required', 'string', 'max:255'],
+            'document_type' => ['required', 'string', 'max:255'],
+            'document_number' => [
+                'required',
+                'string',
+                'max:255', 
+                Rule::unique(User::class)->ignore($this->user()->id),
+            ],
+            'phone_number' => ['required', 'string', 'max:255'],
+            'academic_formation'   => ['array'],
+            'academic_formation.*.institution' => [ 'string', 'max:255'],
+            'academic_formation.*.degree'      => [ 'string', 'max:255'],
+            'academic_formation.*.startYear' => [ 'integer' ],
+            'academic_formation.*.endYear'   => [ 'integer', 'nullable' ],
+
+            'work_experience'   => [ 'array'],
+            'work_experience.*.company'    => [ 'string', 'max:255'],
+            'work_experience.*.position'   => [ 'string', 'max:255'],
+            'work_experience.*.startYear' => [ 'integer' ],
+            'work_experience.*.endYear'   => [ 'integer', 'nullable' ],
         ];
     }
 }

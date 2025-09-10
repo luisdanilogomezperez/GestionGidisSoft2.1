@@ -34,9 +34,9 @@
               <li class="nav-item d-flex align-items-center">
                 <router-link :to="{ name: 'Login' }" @click="logout" class="px-0 nav-link font-weight-bold lh-1 d-flex align-items-center">
                   <i class="material-icons ms-2" :class="isRTL ? 'ms-sm-2' : 'me-sm-1'">
-                    logout
+                    Cerrar Sesión
                   </i>
-                  Logout
+                  Cerrar Sesión
                 </router-link>
               </li>
             </ul>
@@ -55,7 +55,7 @@
           <li class="px-3 nav-item d-flex align-items-center">
             <a class="p-0 nav-link lh-1" @click="toggleConfigurator" :class="color ? color : 'text-body'">
               <i class="material-icons fixed-plugin-button-nav cursor-pointer">
-                settings
+                Configuración
               </i>
             </a>
           </li>

@@ -40,6 +40,8 @@ class User extends Authenticatable
         'document_type',
         'document_number',
         'is_enable',
+        'academic_formation',
+        'work_experience'
     ];
 
     /**
@@ -62,6 +64,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'academic_formation' => 'array',
+            'work_experience' => 'array',
         ];
     }
 

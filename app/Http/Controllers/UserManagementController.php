@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use \Illuminate\Validation\ValidationException;
 
 class UserManagementController extends Controller
 {
@@ -27,22 +28,6 @@ class UserManagementController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return Inertia::render("PegesUsers/Create");
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     public function getRoles(User $user)
     {
         // Roles disponibles
@@ -56,7 +41,111 @@ class UserManagementController extends Controller
         ]);
     }
 
-    public function updateRoles(Request $request, User $user)
+    public function createRole(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|unique:roles,name',
+            ]);
+
+            $role = Role::create(['name' => $request->name]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Rol creado correctamente',
+                'role' => $role,
+            ], 201);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+    }
+
+    public function updateRole(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|unique:roles,name,' . $id,
+        ]);
+
+        $role = Role::findOrFail($id);
+        $role->update([
+            'name' => $request->name,
+        ]);
+
+        return response()->json([
+            'message' => 'Rol actualizado correctamente.',
+            'role' => $role,
+        ]);
+    }
+
+    public function deleteRole(Request $request, $id)
+    {
+        $role = Role::findOrFail($id);
+        $role->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rol eliminado correctamente.',
+        ]);
+    }
+
+    public function deletePermission(Request $request, $id)
+    {
+        $permission = Permission::findOrFail($id);
+        $permission->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permiso eliminado correctamente.',
+        ]);
+    }
+
+    public function createPermission(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|unique:permissions,name',
+            ]);
+
+            $permission = Permission::create(['name' => $request->name]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permiso creado correctamente',
+                'permission' => $permission,
+            ], 201);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+    }
+
+    public function updatePermission(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|unique:permissions,name,' . $id,
+        ]);
+
+        $permission = Permission::findOrFail($id);
+        $permission->update([
+            'name' => $request->name,
+        ]);
+
+        return response()->json([
+            'message' => 'Permiso actualizado correctamente.',
+            'permission' => $permission,
+        ]);
+    }
+
+    public function updateRolesUser(Request $request, User $user)
     {
         $validated = $request->validate([
             'roles' => 'array',
@@ -68,7 +157,7 @@ class UserManagementController extends Controller
         return back()->with('success', 'Roles actualizados correctamente.');
     }
 
-    public function updatePermissions(Request $request, Role $role)
+    public function updatePermissionsUser(Request $request, Role $role)
     {
         // Validar que vienen permisos como array
         $data = $request->validate([
@@ -87,17 +176,26 @@ class UserManagementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        // Cargamos todas las relaciones del usuario
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function getInfoUser(string $id)
     {
-        //
+        $userInfo = User::with([
+            'roles',
+            'articles',
+            'books',
+            'bookChapters',
+            'directedProjects',
+            'events',
+            'otherJobs',
+            'presentations',
+            'researchProjects'
+        ])->findOrFail($id);
+
+        return Inertia::render('PagesUsers/UserInfo', ['userInfo' => $userInfo]);
     }
 
     /**
@@ -113,16 +211,44 @@ class UserManagementController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+
+            return response()->json(['message' => 'Usuario eliminado correctamente']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'Ocurió un error al eliminar el usuario.']);
+        }
     }
 
-    public function enable(string $id)
+    public function enable(Request $request, string $id)
     {
-        //
+        try {
+            $user = User::findOrFail($id);
+            $user->is_enable = true;
+            $user->save();
+
+            return response()->json(['message' => 'Usuario habilitado correctamente']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'No se pudo habilitar el usuario.']);
+        }
+        
     }
 
-    public function disable(string $id)
+    public function disable(Request $request, string $id)
     {
-        //
+        try {
+            $user = User::findOrFail($id);
+
+            $user->is_enable = false;
+            $user->save();
+
+            return response()->json(['message' => 'Usuario deshabilitado correctamente']);
+            //return back()->with('success', 'Usuario deshabilitado correctamente.');
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'No se pudo deshabilitar el usuario.']);
+            //return back()->with('error', 'No se pudo deshabilitar el usuario.');
+        }
+        
     }
 }
