@@ -49,10 +49,10 @@ const hasFile = computed(() =>
     <!-- Zona de arrastre / botón -->
     <label
       :for="computedId"
-      class="flex flex-col items-center justify-center w-full h-40 dark:bg-gray-600 border-2 border-dashed border-red-400 rounded-xl cursor-pointer bg-red-50 hover:bg-red-100 dark:hover:bg-red-200 transition"
+      class="flex flex-col items-center justify-center w-full dark:text-red-700 h-15 dark:bg-gray-600 border-2 border-dashed border-red-400 rounded-xl cursor-pointer bg-red-50 hover:bg-red-100 dark:hover:bg-red-200 transition"
       :class="{ 'opacity-60 pointer-events-none': disabled }"
     >
-      <svg class="w-10 h-10 text-red-500 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <svg class="w-10 h-10 text-red-500 dark:text-red-700 mb-1 mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12V4m0 8l-4-4m4 4l4-4"/>
       </svg>
       <p class="text-red-600 font-medium">{{ placeholder }}</p>

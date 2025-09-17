@@ -10,6 +10,7 @@ use App\Models\MenuItem;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\Setting;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -91,7 +92,14 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'menu' => $menuItems
+            'menu' => $menuItems,
+            'logos' => function () {
+                return [
+                    'logo_application' => Setting::getValue('logo_application'),
+                    'logo_institution' => Setting::getValue('logo_institution'),
+                    'logo_academic_program' => Setting::getValue('logo_academic_program'),
+                ];
+            },
         ];
     }
 }

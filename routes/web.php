@@ -63,6 +63,9 @@ Route::get('/dashboard/permissions', [DashboardController::class, 'getAllPermiss
 Route::get('/dashboard/{idRole}/permissions', [DashboardController::class, 'getAllPermissionsRole'])
     ->name('role-permissions');
 
+Route::post('/settings/logos', [DashboardController::class, 'updateLogos'])
+    ->name('settings.update-logos');
+    
 Route::get('/roles/{role}/permissions', function (Role $role) {
 return $role->permissions()->select('id','name')->get();
 });

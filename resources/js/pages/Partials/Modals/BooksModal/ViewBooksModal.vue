@@ -122,7 +122,7 @@ watch(
             Ver información del libro
         </template>
         <template #description>
-            A continuacion vera toda la informacion del libro: {{ form.title }}
+            A continuación vera toda la informacion del libro: {{ form.title }}
         </template>
         <!-- Campos del formulario -->
         <template #form>

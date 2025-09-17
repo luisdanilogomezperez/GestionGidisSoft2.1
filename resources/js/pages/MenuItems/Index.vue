@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useForm, router } from '@inertiajs/vue3';
+import { useForm, router, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import * as AllIcons from '@kalimahapps/vue-icons';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -7,13 +7,19 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import CollapsibleCard from '@/components/CollapsibleCard.vue';
 import Pagination from '@/components/Pagination.vue';
-import { AkTrashCan, BsPencilSquare } from '@kalimahapps/vue-icons';
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import Input from '@/components/ui/input/Input.vue';
+import SecondaryButton from '@/components/SecondaryButton.vue';
+import SettingsModal from '../Partials/Modals/SettingsModal/SettingsModal.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{
-  title: 'Configuración Dashboard', 
+  title: 'Ajustes Generales', 
   href: '/menu-items' 
 }];
 
+const page = usePage();
 const props = defineProps({
     items: Array
 });
@@ -27,6 +33,22 @@ const form = useForm({
 });
 
 const editingId = ref<number | null>(null);
+const createNewItem = ref(false);
+const showConfigLogo = ref('cerrar');
+
+function createNewItemToggle() {
+    createNewItem.value = true
+}
+
+function showConfigLogoToggle() {
+    showConfigLogo.value = 'abrir'
+}
+
+function close() {
+    createNewItem.value = false
+    form.reset();
+    editingId.value = null;
+}
 
 function submit() {
     if (editingId.value) {
@@ -55,8 +77,8 @@ function submit() {
 // Acciones disponibles
 const itemsActions = ref([
   { value: '', text: 'Seleccione una acción', disabled: true },
-  { value: 'delete', text: 'Eliminar', icon: AkTrashCan },
-  { value: 'edit', text: 'Modificar', icon: BsPencilSquare },
+  { value: 'delete', text: 'Eliminar' },
+  { value: 'edit', text: 'Modificar' },
 ])
 
 
@@ -83,21 +105,92 @@ function handleUserAction(itemId) {
           break;
         
       case 'edit':
-           const item = props.items.data.find(i => i.id === itemId);
-            if (item) {
-                form.title = item.title;
-                form.href = item.href || '';
-                form.icon = item.icon || '';
-                form.permission = item.permission || '';
-                form.order = item.order || 0;
-                editingId.value = item.id;
-            }
+           
           break;
         
       default:
         break;
     }
 }
+
+const editItem =  (item: any) => {
+    if (item) {
+        form.title = item.title;
+        form.href = item.href || '';
+        form.icon = item.icon || '';
+        form.permission = item.permission || '';
+        form.order = item.order || 0;
+        editingId.value = item.id;
+    }
+    createNewItemToggle();
+}
+
+const deleteItem = (itemId: any) => {
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Este libro será eliminado permanentemente",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+    reverseButtons: true,
+    showCloseButton: false,
+    customClass: {
+      confirmButton: "inline-flex items-center px-4 py-2 bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-150 ml-2",
+      cancelButton: "inline-flex items-center px-4 py-2 bg-white border border-blue-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150",
+      closeButton: "text-red-500 hover:text-red-600",
+      icon: "text-red-500 hover:text-red-600",
+    },
+    buttonsStyling: false, 
+    allowOutsideClick: () => !Swal.isLoading(),
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let timerInterval;
+      Swal.fire({
+        title: "Procesando...",
+        html: "Eliminando libro, por favor espere.",
+        timer: 1000, 
+        timerProgressBar: true,
+        allowOutsideClick: false,
+        color: "#b42529",
+        didOpen: () => {
+          Swal.showLoading();
+          const timer = Swal.getPopup().querySelector("b");
+          timerInterval = setInterval(() => {
+            if (timer) timer.textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        }
+      }).then(async () => {
+        try {
+          const response = await axios.delete(`/books/${bookId}`);
+          Swal.fire({
+            title: "Éxito",
+            text: response.data.message || "Libro eliminado correctamente",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+            timerProgressBar: true,
+            color: "#b42529",
+          });
+          router.reload({ only: ['books'] });
+        } catch (error) {
+          Swal.fire({
+            title: "Error",
+            text: error.response?.data?.message || "Ocurrió un error al eliminar el libro.",
+            icon: "error",
+            timer: 1500,
+            showConfirmButton: false,
+            timerProgressBar: true
+          });
+        }
+      });
+    }
+  });
+};
+
 </script>
 
 <template>
@@ -105,18 +198,36 @@ function handleUserAction(itemId) {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-4">
             <!-- Formulario -->
-            <form @submit.prevent="submit" class="mb-6 space-y-2">
-                <input v-model="form.title" placeholder="Título" class="border p-2 w-full" />
-                <input v-model="form.href" placeholder="Ruta /href" class="border p-2 w-full" />
-                <input v-model="form.permission" placeholder="Permiso (opcional)" class="border p-2 w-full" />
-                <input v-model.number="form.order" type="number" placeholder="Orden" class="border p-2 w-full" />
-                <input v-model="form.icon" type="text" placeholder="Nombre del Icono" class="border p-2 w-full" />
-
-
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">
+            <div class="flex justify-start gap-4">
+                <PrimaryButton @click="showConfigLogoToggle" type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">
+                        Gestionar Logos
+                </PrimaryButton>
+                <PrimaryButton v-if="!createNewItem" @click="createNewItemToggle" type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">
+                        Nuevo Item
+                </PrimaryButton>
+                <SettingsModal
+                :show=" showConfigLogo === 'abrir'"
+                :max-width="'80'"
+                :closeable="true"
+                @close="() => { 
+                    showConfigLogo = 'cerrar'; 
+                }"
+                />
+            </div>
+            
+            <form v-if="createNewItem" @submit.prevent="submit" class="mb-6 space-y-2 mt-6">
+                <Input v-model="form.title" required placeholder="Título"  />
+                <Input v-model="form.href"  required placeholder="Ruta /href" />
+                <Input v-model="form.permission" placeholder="Permiso (opcional)" />
+                <Input v-model.number="form.order" required type="number" placeholder="Orden" />
+                <Input v-model="form.icon" type="text" required placeholder="Nombre del Icono" />
+                
+                <SecondaryButton @click="close">
+                    Cancelar
+                </SecondaryButton>
+                <PrimaryButton type="submit" class="ml-2">
                     {{ editingId ? 'Actualizar' : 'Guardar' }}
-                </button>
-
+                </PrimaryButton>
             </form>
 
             <!-- Lista de menú existente -->
@@ -141,19 +252,23 @@ function handleUserAction(itemId) {
                               <td class="px-4 py-2 truncate"><component v-if="item.icon" :is="AllIcons[item.icon]" class="w-5 h-5" /></td>
                               <td class="px-4 py-2 truncate">{{ item.order }}</td>
                               <td class="px-4 py-2">
-                                  <select
-                                  v-model="itemsActionsSelected[item.id]"
-                                  @change="handleUserAction(item.id)"
-                                  class="w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 sm:text-sm p-1"
-                                  >
-                                    <option
-                                    v-for="action in itemsActions"
-                                    :key="action.value"
-                                    :value="action.value"
-                                    >
-                                        {{ action.text }}
-                                    </option>
-                                  </select>
+                                <button
+                                type="button"
+                                title="Eliminar"
+                                @click="deleteItem(item.id)"
+                                class="p-1"
+                                >   
+                                  <component :is="AllIcons['AkTrashCan']" class="text-red-500 w-5 h-5" />
+                                </button>
+                                <!-- Botón Editar -->
+                                <button
+                                type="button"
+                                title="Editar"
+                                @click="editItem(item)"
+                                class="pl-2 p-1"
+                                >
+                                  <component :is="AllIcons['BsPencilSquare']" class="text-blue-500 w-5 h-5" />
+                                </button>
                               </td>
                             </tr>
                         </tbody>

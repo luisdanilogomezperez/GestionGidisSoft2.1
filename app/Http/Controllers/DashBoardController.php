@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use App\Models\Setting;
 
 
 class DashBoardController extends Controller
@@ -46,4 +47,35 @@ class DashBoardController extends Controller
             'permissions' => $allPermissions,
         ]);
     }
+    public function updateLogos(Request $request)
+    {
+        $logos = [
+            'logo_application',
+            'logo_institution',
+            'logo_academic_program',
+        ];
+
+        foreach ($logos as $logoKey) {
+            if ($request->hasFile($logoKey)) {
+                // Guardamos en "storage/app/public/logos"
+                $path = $request->file($logoKey)->store('logos', 'public');
+
+                // Ajustamos para que quede con prefijo "storage/"
+                $publicPath = 'storage/' . $path;
+
+                // Guardamos en la tabla settings
+                Setting::updateOrCreate(
+                    ['key' => $logoKey],
+                    ['value' => $publicPath]
+                );
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logos actualizados correctamente',
+            'logos' => $logos
+        ]);
+    }
+
 }

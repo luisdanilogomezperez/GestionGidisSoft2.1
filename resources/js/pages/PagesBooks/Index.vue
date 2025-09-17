@@ -8,7 +8,7 @@ import Pagination from '@/components/Pagination.vue';
 import { ref, computed, watch, defineProps } from 'vue'
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import CreateBooksModal from '../Partials/Modals/BooksModal/CreateBooksModal.vue';
-import { AkTrashCan, BsPencilSquare, CaDataViewAlt } from '@kalimahapps/vue-icons';
+import * as AllIcons from '@kalimahapps/vue-icons';
 import ViewBooksModal from '../Partials/Modals/BooksModal/ViewBooksModal.vue';
 import axios from 'axios'
 import Swal from 'sweetalert2'
@@ -220,7 +220,7 @@ const viewBook = (book: any) => {
                                     @click="deleteBook(item.id)"
                                     class="p-1"
                                     >
-                                    <AkTrashCan class="text-red-500 w-5 h-5"/>
+                                    <component :is="AllIcons['AkTrashCan']" class="text-red-500 w-5 h-5" />
                                     </button>
                                     <!-- Botón Editar -->
                                     <button
@@ -229,7 +229,7 @@ const viewBook = (book: any) => {
                                     @click="editBook(item)"
                                     class="pl-2 p-1"
                                     >
-                                    <BsPencilSquare class="text-blue-500 w-5 h-5"/>
+                                    <component :is="AllIcons['BsPencilSquare']" class="text-blue-500 w-5 h-5" />
                                     </button>
                                     <!-- Botón ver -->
                                     <button
@@ -238,7 +238,7 @@ const viewBook = (book: any) => {
                                     @click="viewBook(item)"
                                     class="pl-2 p-1"
                                     >
-                                    <CaDataViewAlt class="text-green-800 w-5 h-5"/>
+                                    <component :is="AllIcons['CaDataViewAlt']" class="text-green-500 w-5 h-5" />
                                     </button>
                                 </td>
                             </tr>

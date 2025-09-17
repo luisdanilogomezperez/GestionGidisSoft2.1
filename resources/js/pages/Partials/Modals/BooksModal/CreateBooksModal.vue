@@ -284,7 +284,7 @@ const hasContent = computed(() => {
             {{ editingId ? 'Editar Libro' : 'Crear Libro' }}
         </template>
         <template #description>
-            A continuacion ingrese la informacion necesaria para  {{ editingId ? 'editar el libro.' : 'crear el libro.' }}
+            A continuación ingrese la informacion necesaria para  {{ editingId ? 'editar el libro.' : 'crear el libro.' }}
         </template>
         <!-- Campos del formulario -->
         <template #form>
@@ -295,7 +295,11 @@ const hasContent = computed(() => {
               <Label for="year">Año</Label>
               <Input id="title" class="col-span-2" v-model="form.title" required autocomplete="title" placeholder="Titulo del libro" />
               <Input id="month" v-model="form.month" required autocomplete="month" placeholder="Mes" />
-              <Input id="year" v-model="form.year" required autocomplete="year" placeholder="Año"/>
+              <Input id="year" v-model="form.year" 
+              required autocomplete="year" placeholder="Año"
+              inputmode="numeric"
+              pattern="[0-9]*" 
+              @input="form.year = form.year.replace(/\D/g, '')"/>
               <InputError class="text-red-500" :message="form.errors.title" />
               <InputError class=" text-red-500" :message="form.errors.year" />
             </div>
@@ -387,7 +391,7 @@ const hasContent = computed(() => {
                     placeholder="Subir aval de institución"
                     class="pt-2"
                 />
-                    <div v-if="form.institution_endorsement_certificate_url && !form.institution_endorsement_certificate" class="mt-2">
+                    <div v-if="form.institution_endorsement_certificate_url && !form.institution_endorsement_certificate" class="mt-2 dark:bg-gray-900">
                         <a :href="`/storage/${form.institution_endorsement_certificate_url}`" target="_blank" class="text-blue-500 underline">
                         Ver archivo actual
                         </a>

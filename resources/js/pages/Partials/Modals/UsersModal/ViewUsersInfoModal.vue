@@ -104,7 +104,7 @@ const documentTypes = ref([
             Ver información de Usuarios
         </template>
         <template #description>
-            A continuacion vera toda la informacion del usuario: {{ form.name }} {{ form.last_name }}
+            A continuación vera toda la informacion del usuario: {{ form.name }} {{ form.last_name }}
         </template>
 
         <!-- Campos del formulario -->

@@ -7,6 +7,7 @@ use App\Models\MenuItem;
 use Inertia\Inertia;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Models\Setting;
 
 class MenuItemController extends Controller
 {
@@ -14,7 +15,7 @@ class MenuItemController extends Controller
     {
         $items = MenuItem::orderBy('order', 'asc')->paginate(10);
         return Inertia::render('MenuItems/Index', [
-            'items' => $items
+            'items' => $items,
         ]);
     }
 
